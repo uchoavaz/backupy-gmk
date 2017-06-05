@@ -52,96 +52,96 @@ class Pg_Backup():
         self.config = bkp_config
         self.email_config = email_config
 
-    def mount(self, config):
-        msg = "Mounting"
-        self.pk_log_row = self.db.insert(
-            self.config['db_name_log_record'], {
-                'backup_id': self.pk_row,
-                'log': msg,
-                'status': 1,
-                'log_datetime': 'now()'
-            }
-        )
-        cmd = self.commands['mount'].format(
-            config['user_password'],
-            config['server_address'],
-            config['server_mount_folder'],
-            config['local_destiny_folder'],
-            config['server_user'],
-            config['server_password'])
+    # def mount(self, config):
+    #     msg = "Mounting"
+    #     self.pk_log_row = self.db.insert(
+    #         self.config['db_name_log_record'], {
+    #             'backup_id': self.pk_row,
+    #             'log': msg,
+    #             'status': 1,
+    #             'log_datetime': 'now()'
+    #         }
+    #     )
+    #     cmd = self.commands['mount'].format(
+    #         config['user_password'],
+    #         config['server_address'],
+    #         config['server_mount_folder'],
+    #         config['local_destiny_folder'],
+    #         config['server_user'],
+    #         config['server_password'])
 
-        mount = subprocess.call(cmd, shell=True)
-        if mount != 0:
-            msg = ' Could not mount server'
-            raise Exception(msg)
+    #     mount = subprocess.call(cmd, shell=True)
+    #     if mount != 0:
+    #         msg = ' Could not mount server'
+    #         raise Exception(msg)
 
-        msg = 'Mounted with success'
-        self.db.update(
-            self.config['db_name_log_record'], {
-                'id': self.pk_log_row,
-                'status': 2,
-                'log': msg
-            }
+    #     msg = 'Mounted with success'
+    #     self.db.update(
+    #         self.config['db_name_log_record'], {
+    #             'id': self.pk_log_row,
+    #             'status': 2,
+    #             'log': msg
+    #         }
 
-        )
-        self.steps_done.append(True)
-        self.db.update(
-            self.config['db_name_record'], {
-                'id': self.pk_row,
-                'status': 1,
-                'percents_completed': self.count_percentage(),
-                'finish_backup_datetime': 'NULL'
-            }
+    #     )
+    #     self.steps_done.append(True)
+    #     self.db.update(
+    #         self.config['db_name_record'], {
+    #             'id': self.pk_row,
+    #             'status': 1,
+    #             'percents_completed': self.count_percentage(),
+    #             'finish_backup_datetime': 'NULL'
+    #         }
 
-        )
+    #     )
 
-        self.email_context_success = self.email_context_success \
-            + '- {0}\n'.format(msg)
+    #     self.email_context_success = self.email_context_success \
+    #         + '- {0}\n'.format(msg)
 
-    def umount(self, config):
-        try:
-            msg = "Umounting"
-            self.pk_log_row = self.db.insert(
-                self.config['db_name_log_record'], {
-                    'backup_id': self.pk_row,
-                    'log': msg,
-                    'status': 1,
-                    'log_datetime': 'now()'
-                }
-            )
-            os.chdir(get_last_folder_path(config['local_destiny_folder']))
-            cmd = self.commands['umount'].format(
-                config['user_password'],
-                config['local_destiny_folder'])
-            umount = subprocess.call(cmd, shell=True)
-            if umount != 0:
-                msg = 'Could not umount folder'
-                raise Exception(msg)
+    # def umount(self, config):
+    #     try:
+    #         msg = "Umounting"
+    #         self.pk_log_row = self.db.insert(
+    #             self.config['db_name_log_record'], {
+    #                 'backup_id': self.pk_row,
+    #                 'log': msg,
+    #                 'status': 1,
+    #                 'log_datetime': 'now()'
+    #             }
+    #         )
+    #         os.chdir(get_last_folder_path(config['local_destiny_folder']))
+    #         cmd = self.commands['umount'].format(
+    #             config['user_password'],
+    #             config['local_destiny_folder'])
+    #         umount = subprocess.call(cmd, shell=True)
+    #         if umount != 0:
+    #             msg = 'Could not umount folder'
+    #             raise Exception(msg)
 
-            msg = 'Umounted with success'
-            self.steps_done.append(True)
-            self.db.update(
-                self.config['db_name_log_record'], {
-                    'id': self.pk_log_row,
-                    'status': 2,
-                    'log': msg
-                }
+    #         msg = 'Umounted with success'
+    #         self.steps_done.append(True)
+    #         self.db.update(
+    #             self.config['db_name_log_record'], {
+    #                 'id': self.pk_log_row,
+    #                 'status': 2,
+    #                 'log': msg
+    #             }
 
-            )
-            self.db.update(
-                self.config['db_name_record'], {
-                    'id': self.pk_row,
-                    'status': 1,
-                    'percents_completed': self.count_percentage(),
-                    'finish_backup_datetime': 'NULL'
-                }
+    #         )
+    #         self.db.update(
+    #             self.config['db_name_record'], {
+    #                 'id': self.pk_row,
+    #                 'status': 1,
+    #                 'percents_completed': self.count_percentage(),
+    #                 'finish_backup_datetime': 'NULL'
+    #             }
 
-            )
+    #         )
 
-            self.email_context_success = self.email_context_success \
-                + '- {0}\n'.format(msg)
-        except Exception as err:
-            self.treat_exception(err)
+    #         self.email_context_success = self.email_context_success \
+    #             + '- {0}\n'.format(msg)
+    #     except Exception as err:
+    #         self.treat_exception(err)
 
     def insert_config(self, pg_user, db_password):
         export_cmd = self.commands['exp_pws'].format(
@@ -424,19 +424,19 @@ class Pg_Backup():
             self.pk_row = self.db.insert(
                 self.config['db_name_record'], column_value)
 
-            query = (
-                u"UPDATE {0} SET database_storage_ip='{1}', storage_ip='{2}',"
-                " path_folders_pass='{3}', storage_destiny_path='{4}' WHERE id={5}"
-            ).format(
-                self.config['db_name_record'],
-                self.db.get_ip(),
-                self.config['server_address'],
-                ','.join(self.config['folders_to_pass']),
-                self.config['server_mount_folder'],
-                self.pk_row
-            )
-            self.db.query(query)
-            self.mount(self.config)
+            # query = (
+            #     u"UPDATE {0} SET database_storage_ip='{1}', storage_ip='{2}',"
+            #     " path_folders_pass='{3}', storage_destiny_path='{4}' WHERE id={5}"
+            # ).format(
+            #     self.config['db_name_record'],
+            #     self.db.get_ip(),
+            #     self.config['server_address'],
+            #     ','.join(self.config['folders_to_pass']),
+            #     self.config['server_mount_folder'],
+            #     self.pk_row
+            # )
+            # self.db.query(query)
+            # self.mount(self.config)
 
             self.insert_config(
                 self.config['pg_user'], self.config['db_password'])
@@ -493,7 +493,7 @@ class Pg_Backup():
             self.treat_exception(err)
 
         finally:
-            self.umount(self.config)
+            # self.umount(self.config)
             percentage = self.count_percentage()
             if self.get_status() == 3:
                 percentage = 100
