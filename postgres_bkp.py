@@ -31,11 +31,11 @@ class Pg_Backup():
         'shell_mount_file_name': 'mount.sh',
         'check_pg_psw': 'printenv PGPASSWORD',
         'exp_pws': 'echo "localhost:*:*:{0}:{1}" > ~/.pgpass',
-        'list_dbs': "echo 'select datname from pg_database' | psql -t -U {0} -h {1}",
-        'list_dbs_error': "psql --list  | cut -f1 -d '|' | tail -n +4",
-        'bkp': 'pg_dump -h {0} -p {1} -U {2} -F c -b -v -f "{3}" {4}',
-        'bkp_error': 'pg_dump -U {0} -w {1} > {2}',
-        'rsync': 'echo {0} | sudo -S rsync -r {1} {2}',
+        'list_dbs_error': "echo 'select datname from pg_database' | psql -t -U {0} -h {1}",
+        'list_dbs': "sudo -u postgres PGPASSWORD={0} psql --list -U {1} -h {2} | cut -f1 -d '|' | tail -n +4",
+        'bkp': 'PGPASSWORD={0} pg_dump -h {1} -p {2} -U {3} -F c -b -v -f "{4}" {5}',
+        'bkp_error': 'PGPASSWORD={0} pg_dump -U {1} -w {2} > {3}',
+        'rsync': 'rsync -r {0} {1}',
         'mount': " echo {0} | sudo -S mount -t cifs '//{1}{2}' '{3}' -o username='{4}',password='{5}',rw,dir_mode=0777,file_mode=0777",
         'umount': "echo {0} | sudo -S umount {1}"
     }
@@ -151,11 +151,11 @@ class Pg_Backup():
         if cmd != 0:
             raise Exception('Was not possible to set PGPASSWORD')
 
-    def get_db_list(self, pg_user, host_machine):
+    def get_db_list(self, db_password, pg_user, host_machine):
         try:
             databases = subprocess.Popen(
                 self.commands['list_dbs']
-                .format(pg_user, host_machine), shell=True,
+                .format(db_password, pg_user, host_machine), shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE).stdout.readlines()
 
@@ -201,6 +201,7 @@ class Pg_Backup():
                 path = os.path.join(self.bkp_folder_path, file_name)
                 bkp = subprocess.call(
                     self.commands['bkp_error'].format(
+                        config['db_password'],
                         config['pg_user'],
                         db_name,
                         path
@@ -210,6 +211,7 @@ class Pg_Backup():
                 if bkp != 0:
                     bkp = subprocess.call(
                         self.commands['bkp'].format(
+                            config['db_password'],
                             config['host_machine'],
                             config['port'],
                             config['pg_user'],
@@ -309,7 +311,6 @@ class Pg_Backup():
             sync = subprocess.call(
                 self.commands['rsync']
                 .format(
-                    config['user_password'],
                     path,
                     config['local_destiny_folder']
                 ), shell=True)
@@ -441,7 +442,7 @@ class Pg_Backup():
             self.insert_config(
                 self.config['pg_user'], self.config['db_password'])
             db_list = self.get_db_list(
-                self.config['pg_user'], self.config['host_machine'])
+                self.config['db_password'], self.config['pg_user'], self.config['host_machine'])
 
             self.create_bkp_files(db_list, self.config)
             msg = "Deleting old folders"
