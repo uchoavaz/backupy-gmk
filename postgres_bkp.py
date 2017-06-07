@@ -375,7 +375,7 @@ class Pg_Backup():
             email.mail()
         except KeyError as error:
             error = "Error to create email! Variable not found: ".format(
-                self.server_name + str(error)
+                self.server_name) + str(error)
 
     def treat_exception(self, err):
         err = remover_acentos(str(err).replace("'", '_'))
@@ -388,7 +388,7 @@ class Pg_Backup():
             }
 
         )
-        err = 'Error in {0}:'.format(self.server_name + str(err)
+        err = 'Error in {0}:'.format(self.server_name) + str(err)
         self.email_context_error = \
             self.email_context_error + err + '\n'
 
