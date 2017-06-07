@@ -51,6 +51,7 @@ class Pg_Backup():
         self.db = InsertData()
         self.config = bkp_config
         self.email_config = email_config
+        self.server_name = self.config['server_name']
 
     # def mount(self, config):
     #     msg = "Mounting"
@@ -277,7 +278,7 @@ class Pg_Backup():
                 msg)
 
     def create_folder(self, folder_path):
-        host_name = socket.gethostname()
+        host_name = self.server_name
         folder_name = host_name + "_bkps"
         self.local_path_folder = os.path.join(folder_path, folder_name)
         if not os.path.isdir(self.local_path_folder):
@@ -369,12 +370,12 @@ class Pg_Backup():
     def dispatch_email(self, email_context):
         try:
             subject = self.email['email_subject'].format(
-                socket.gethostname(), time.strftime('%d-%m-%Y:%H:%M'))
+                self.server_name, time.strftime('%d-%m-%Y:%H:%M'))
             email = Email(self.email_config, subject, email_context)
             email.mail()
         except KeyError as error:
             error = "Error to create email! Variable not found: ".format(
-                socket.gethostname()) + str(error)
+                self.server_name + str(error)
 
     def treat_exception(self, err):
         err = remover_acentos(str(err).replace("'", '_'))
@@ -387,7 +388,7 @@ class Pg_Backup():
             }
 
         )
-        err = 'Error in {0}:'.format(socket.gethostname()) + str(err)
+        err = 'Error in {0}:'.format(self.server_name + str(err)
         self.email_context_error = \
             self.email_context_error + err + '\n'
 
@@ -416,7 +417,7 @@ class Pg_Backup():
         try:
 
             column_value = {
-                'name': socket.gethostname(),
+                'name': self.server_name,
                 'percents_completed': 0,
                 'status': 1,
                 'start_backup_datetime': 'now()',
@@ -485,7 +486,7 @@ class Pg_Backup():
 
         except KeyError as err:
             err = "Error in {0}! Variable not found: ".format(
-                socket.gethostname()) + str(err)
+                self.server_name) + str(err)
             print (err)
             self.email_context_error = \
                 self.email_context_error + err + '\n'
