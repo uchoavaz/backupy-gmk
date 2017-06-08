@@ -11,7 +11,7 @@ BKP_CONFIG = {
     'host_machine': '172.16.225.6.',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/media/',
+    'local_destiny_folder': '/rancher/',
     'server_mount_folder': '/rosalind/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
