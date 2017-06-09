@@ -2,7 +2,7 @@
 from postgres_bkp import Pg_Backup
 
 BKP_CONFIG = {
-    'server_name': 'rancher-apps-homolog',
+    'server_name': 'rancher-apps-prod',
     'db_name_record': 'core_backup',
     'total_steps': 3.0,
     'db_name_log_record': 'core_backuplog',
