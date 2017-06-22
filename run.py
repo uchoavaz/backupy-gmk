@@ -1,4 +1,3 @@
-
 from postgres_bkp import Pg_Backup
 
 BKP_CONFIG = {
@@ -8,10 +7,10 @@ BKP_CONFIG = {
     'db_name_log_record': 'core_backuplog',
     'user_password': 'g3n0m1k@',
     'pg_user': 'genomika',
-    'host_machine': '172.16.225.6.',
+    'host_machine': '172.16.225.9.',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/rancher/',
+    'local_destiny_folder': '/rancher/rosalind/Backups/Bancos/',
     'server_mount_folder': '/rosalind/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
