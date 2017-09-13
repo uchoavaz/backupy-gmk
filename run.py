@@ -2,17 +2,17 @@
 from postgres_bkp import Pg_Backup
 
 BKP_CONFIG = {
-    'server_name': 'rancher-apps-homolog',
+    'server_name': 'rancher-bioinfo',
     'db_name_record': 'core_backup',
     'total_steps': 3.0,
     'db_name_log_record': 'core_backuplog',
     'user_password': 'g3n0m1k@',
     'pg_user': 'genomika',
-    'host_machine': '172.16.225.6.',
+    'host_machine': '172.16.230.22',
     'db_password': 'g3n3t1c@',
     'port': '5432',
     'local_destiny_folder': '/rancher/',
-    'server_mount_folder': '/rosalind/Backups/Bancos/',
+    'server_mount_folder': '/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
         'template0',
