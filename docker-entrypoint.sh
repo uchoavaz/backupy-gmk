@@ -4,6 +4,7 @@
 echo "listen_addresses = '*'" >> /etc/postgresql/9.6/main/postgresql.conf
 service postgresql restart
 
+cd /var/www/backupy
 git checkout $backupy_branch
 
 /www/var/backupy/crontab.sh
