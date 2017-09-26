@@ -22,6 +22,7 @@ BKP_CONFIG = {
     # 'server_password': 'g3n3t1c@',
     'days_delete': 7,
     'folders_to_pass': [
+        /rancher/apps/gensoft/dockerfiles,
     ],
     'send_email_success': True
 }
