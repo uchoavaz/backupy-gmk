@@ -47,7 +47,7 @@ class Pg_Backup():
     }
 
     def __init__(self, bkp_config, email_config):
-        self.db = InsertData()
+        # self.db = InsertData()
         self.config = bkp_config
         self.email_config = email_config
         self.server_name = self.config['server_name']
@@ -173,14 +173,14 @@ class Pg_Backup():
 
     def create_bkp_files(self, databases, config):
         msg = "Pulling databases"
-        self.pk_log_row = self.db.insert(
-            self.config['db_name_log_record'], {
-                'backup_id': self.pk_row,
-                'log': msg,
-                'status': 1,
-                'log_datetime': 'now()'
-            }
-        )
+        # self.pk_log_row = self.db.insert(
+        #     self.config['db_name_log_record'], {
+        #         'backup_id': self.pk_row,
+        #         'log': msg,
+        #         'status': 1,
+        #         'log_datetime': 'now()'
+        #     }
+        # )
         bkp_context_success = []
         bkp_context_error = []
         db_to_pass = ','.join(databases).replace(' ', '').replace('\n', '')
@@ -189,7 +189,7 @@ class Pg_Backup():
             db_to_pass,
             self.pk_row
         )
-        self.db.query(query)
+        # self.db.query(query)
 
         for database in databases:
             db_name = clear_name(database)
@@ -240,39 +240,39 @@ class Pg_Backup():
             ','.join(bkp_context_success),
             self.pk_row
         )
-        self.db.query(query)
+        # self.db.query(query)
 
         self.steps_done.append(True)
-        self.db.update(
-            self.config['db_name_log_record'], {
-                'id': self.pk_log_row,
-                'status': 2,
-                'log': msg
-            }
+        # self.db.update(
+        #     self.config['db_name_log_record'], {
+        #         'id': self.pk_log_row,
+        #         'status': 2,
+        #         'log': msg
+        #     }
 
-        )
-        self.db.update(
-            self.config['db_name_record'], {
-                'id': self.pk_row,
-                'status': 2,
-                'percents_completed': self.count_percentage(),
-                'finish_backup_datetime': 'NULL'
-            }
+        # )
+        # self.db.update(
+        #     self.config['db_name_record'], {
+        #         'id': self.pk_row,
+        #         'status': 2,
+        #         'percents_completed': self.count_percentage(),
+        #         'finish_backup_datetime': 'NULL'
+        #     }
 
-        )
+        # )
 
         self.email_context_success = self.email_context_success \
             + "- {0}\n".format(msg)
         if bkp_context_error != []:
             msg = "No databases backup: {0}".format(','.join(bkp_context_error))
-            self.db.update(
-                self.config['db_name_log_record'], {
-                    'id': self.pk_log_row,
-                    'status': 3,
-                    'log': msg
-                }
+            # self.db.update(
+            #     self.config['db_name_log_record'], {
+            #         'id': self.pk_log_row,
+            #         'status': 3,
+            #         'log': msg
+            #     }
 
-            )
+            # )
             self.email_context_error = "- {0}\n".format(
                 msg)
 
@@ -296,14 +296,14 @@ class Pg_Backup():
 
     def sync(self, config):
         msg = "Synchronizing folders"
-        self.pk_log_row = self.db.insert(
-            self.config['db_name_log_record'], {
-                'backup_id': self.pk_row,
-                'log': msg,
-                'status': 1,
-                'log_datetime': 'now()'
-            }
-        )
+        # self.pk_log_row = self.db.insert(
+        #     self.config['db_name_log_record'], {
+        #         'backup_id': self.pk_row,
+        #         'log': msg,
+        #         'status': 1,
+        #         'log_datetime': 'now()'
+        #     }
+        # )
         bkp_context_success = []
         bkp_context_error = []
         for path in config['folders_to_pass']:
@@ -331,39 +331,39 @@ class Pg_Backup():
             folders_synced,
             self.pk_row
         )
-        self.db.query(query)
+        # self.db.query(query)
 
-        self.db.update(
-            self.config['db_name_log_record'], {
-                'id': self.pk_log_row,
-                'status': 2,
-                'log': msg
-            }
+        # self.db.update(
+        #     self.config['db_name_log_record'], {
+        #         'id': self.pk_log_row,
+        #         'status': 2,
+        #         'log': msg
+        #     }
 
-        )
-        self.db.update(
-            self.config['db_name_record'], {
-                'id': self.pk_row,
-                'status': 1,
-                'percents_completed': self.count_percentage(),
-                'finish_backup_datetime': 'NULL'
-            }
+        # )
+        # self.db.update(
+        #     self.config['db_name_record'], {
+        #         'id': self.pk_row,
+        #         'status': 1,
+        #         'percents_completed': self.count_percentage(),
+        #         'finish_backup_datetime': 'NULL'
+        #     }
 
-        )
+        # )
 
         self.email_context_success = self.email_context_success \
             + '- {0}\n'.format(msg)
         if bkp_context_error != []:
             self.steps_done.pop()
             msg = "Sync with error: {0}".format(','.join(bkp_context_error))
-            self.pk_log_row = self.db.insert(
-                self.config['db_name_log_record'], {
-                    'backup_id': self.pk_row,
-                    'log': msg,
-                    'status': 4,
-                    'log_datetime': 'now()'
-                }
-            )
+            # self.pk_log_row = self.db.insert(
+            #     self.config['db_name_log_record'], {
+            #         'backup_id': self.pk_row,
+            #         'log': msg,
+            #         'status': 4,
+            #         'log_datetime': 'now()'
+            #     }
+            # )
             raise Exception(' {0}'.format(msg))
 
     def dispatch_email(self, email_context):
@@ -379,14 +379,14 @@ class Pg_Backup():
     def treat_exception(self, err):
         err = remover_acentos(str(err).replace("'", '_'))
         self.steps_done.append(False)
-        self.db.update(
-            self.config['db_name_log_record'], {
-                'id': self.pk_log_row,
-                'status': 4,
-                'log': err
-            }
+        # self.db.update(
+        #     self.config['db_name_log_record'], {
+        #         'id': self.pk_log_row,
+        #         'status': 4,
+        #         'log': err
+        #     }
 
-        )
+        # )
         err = 'Error in {0}:'.format(self.server_name) + str(err)
         self.email_context_error = \
             self.email_context_error + err + '\n'
@@ -422,8 +422,8 @@ class Pg_Backup():
                 'start_backup_datetime': 'now()',
                 'finish_backup_datetime': 'NULL'
             }
-            self.pk_row = self.db.insert(
-                self.config['db_name_record'], column_value)
+            # self.pk_row = self.db.insert(
+            #     self.config['db_name_record'], column_value)
 
             # query = (
             #     u"UPDATE {0} SET database_storage_ip='{1}', storage_ip='{2}',"
@@ -446,14 +446,14 @@ class Pg_Backup():
 
             self.create_bkp_files(db_list, self.config)
             msg = "Deleting old folders"
-            self.pk_log_row = self.db.insert(
-                self.config['db_name_log_record'], {
-                    'backup_id': self.pk_row,
-                    'log': msg,
-                    'status': 1,
-                    'log_datetime': 'now()'
-                }
-            )
+            # self.pk_log_row = self.db.insert(
+            #     self.config['db_name_log_record'], {
+            #         'backup_id': self.pk_row,
+            #         'log': msg,
+            #         'status': 1,
+            #         'log_datetime': 'now()'
+            #     }
+            # )
 
             folders_deleted = delete_old_files(
                 self.config['days_delete'],
@@ -461,22 +461,22 @@ class Pg_Backup():
 
             msg = "Old folders deleted: {0}".format(folders_deleted)
             self.steps_done.append(True)
-            self.db.update(
-                self.config['db_name_log_record'], {
-                    'id': self.pk_log_row,
-                    'status': 2,
-                    'log': msg
-                }
-            )
-            self.db.update(
-                self.config['db_name_record'], {
-                    'id': self.pk_row,
-                    'status': 1,
-                    'percents_completed': self.count_percentage(),
-                    'finish_backup_datetime': 'NULL'
-                }
+            # self.db.update(
+            #     self.config['db_name_log_record'], {
+            #         'id': self.pk_log_row,
+            #         'status': 2,
+            #         'log': msg
+            #     }
+            # )
+            # self.db.update(
+            #     self.config['db_name_record'], {
+            #         'id': self.pk_row,
+            #         'status': 1,
+            #         'percents_completed': self.count_percentage(),
+            #         'finish_backup_datetime': 'NULL'
+            #     }
 
-            )
+            # )
             self.email_context_success = self.email_context_success \
                 + '- {0}\n'.format(
                     msg)
@@ -499,16 +499,16 @@ class Pg_Backup():
             if self.get_status() == 3:
                 percentage = 100
 
-            self.db.update(
-                self.config['db_name_record'], {
-                    'id': self.pk_row,
-                    'status': self.get_status(),
-                    'percents_completed': percentage,
-                    'finish_backup_datetime': 'now()'
-                }
-            )
+            # self.db.update(
+            #     self.config['db_name_record'], {
+            #         'id': self.pk_row,
+            #         'status': self.get_status(),
+            #         'percents_completed': percentage,
+            #         'finish_backup_datetime': 'now()'
+            #     }
+            # )
 
-            self.db.close_conn()
+            # self.db.close_conn()
 
             email_ctx_error = self.email_context_error
             email_ctx_success = self.email_context_success
