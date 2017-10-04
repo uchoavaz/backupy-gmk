@@ -10,7 +10,7 @@ BKP_CONFIG = {
     'host_machine': '172.16.225.11',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/rancher/rosalind/',
+    'local_destiny_folder': '/rancher/rosalind/labs_media/',
     'server_mount_folder': '/rosalind/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
@@ -22,7 +22,7 @@ BKP_CONFIG = {
     # 'server_password': 'g3n3t1c@',
     'days_delete': 7,
     'folders_to_pass': [
-        "/rancher/apps/gensoft/mediafiles",
+        "/rancher/apps/gnmk-labs/media",
     ],
     'send_email_success': True
 }
