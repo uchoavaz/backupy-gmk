@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 from database.insert_data import InsertData
 from utils import zip_folder
@@ -35,7 +34,7 @@ class Pg_Backup():
         'list_dbs': "sudo -u postgres PGPASSWORD={0} psql --list -U {1} -h {2} | cut -f1 -d '|' | tail -n +4",
         'bkp': 'PGPASSWORD={0} pg_dump -h {1} -p {2} -U {3} -F c -b -v -f "{4}" {5}',
         'bkp_error': 'PGPASSWORD={0} pg_dump -U {1} -w {2} > {3}',
-        'rsync': 'rsync -r {0} {1}',
+        'rsync': 'echo {0} | sudo -S rsync -ravzup {0} {1}',
         'mount': " echo {0} | sudo -S mount -t cifs '//{1}{2}' '{3}' -o username='{4}',password='{5}',rw,dir_mode=0777,file_mode=0777",
         'umount': "echo {0} | sudo -S umount {1}"
     }
