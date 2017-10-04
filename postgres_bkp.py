@@ -31,7 +31,7 @@ class Pg_Backup():
         'check_pg_psw': 'printenv PGPASSWORD',
         'exp_pws': 'echo "localhost:*:*:{0}:{1}" > ~/.pgpass',
         'list_dbs_error': "echo 'select datname from pg_database' | psql -t -U {0} -h {1}",
-        'list_dbs': "sudo -u postgres PGPASSWORD={0} psql --list -U {1} -h {2} | cut -f1 -d '|' | tail -n +4",
+        'list_dbs': "echo {0} | sudo -S -u postgres PGPASSWORD={0} psql --list -U {1} -h {2} | cut -f1 -d '|' | tail -n +4",
         'bkp': 'PGPASSWORD={0} pg_dump -h {1} -p {2} -U {3} -F c -b -v -f "{4}" {5}',
         'bkp_error': 'PGPASSWORD={0} pg_dump -U {1} -w {2} > {3}',
         'rsync': 'echo {0} | sudo -S -ravzup {0} {1}',
