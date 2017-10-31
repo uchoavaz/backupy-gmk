@@ -1,13 +1,13 @@
 from postgres_bkp import Pg_Backup
 
 BKP_CONFIG = {
-    'server_name': 'rancher-apps-prod',
+    'server_name': 'apps-prod',
     'db_name_record': 'core_backup',
     'total_steps': 3.0,
     'db_name_log_record': 'core_backuplog',
     'user_password': 'g3n0m1k@',
     'pg_user': 'genomika',
-    'host_machine': '172.16.225.20',
+    'host_machine': '172.16.225.12',
     'db_password': 'g3n3t1c@',
     'port': '5432',
     'local_destiny_folder': '/rancher/rosalind/',
