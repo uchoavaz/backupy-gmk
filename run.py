@@ -7,7 +7,7 @@ BKP_CONFIG = {
     'db_name_log_record': 'core_backuplog',
     'user_password': 'g3n0m1k@',
     'pg_user': 'genomika',
-    'host_machine': '172.16.225.12',
+    'host_machine': '172.16.225.17',
     'db_password': 'g3n3t1c@',
     'port': '5432',
     'local_destiny_folder': '/rancher/rosalind/',
