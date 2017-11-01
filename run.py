@@ -23,6 +23,7 @@ BKP_CONFIG = {
     'days_delete': 7,
     'folders_to_pass': [
         "/rancher/apps/gnmk-labs",
+        "/rancher/apps/gensoft/mediafiles/media",
     ],
     'send_email_success': True
 }
