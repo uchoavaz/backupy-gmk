@@ -29,7 +29,7 @@ BKP_CONFIG = {
 }
 
 EMAIL_CONFIG = {
-    'recipient_list': ['joao.victor@genomika.com.br', 'suporte@genomika.com.br'],
+    'recipient_list': ['joao.victor@genomika.com.br'],
     'email_host': 'notificacoes@genomika.com.br',
     'email_password': 'g3n0m1k@',
     'host': 'smtp.gmail.com',
