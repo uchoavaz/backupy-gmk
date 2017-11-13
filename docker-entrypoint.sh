@@ -7,6 +7,7 @@ service postgresql restart
 cd /var/www/backupy
 git checkout $backupy_branch
 
+crontab -r
 /var/www/backupy/crontab.sh
 
 cron -f
