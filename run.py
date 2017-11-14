@@ -10,8 +10,8 @@ BKP_CONFIG = {
     'host_machine': '172.16.230.22',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/rancher/',
-    'server_mount_folder': '/rancher/Backups/Bancos/',
+    'local_destiny_folder': '/rancher/Backups',
+    'server_mount_folder': '/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
         'template0',
