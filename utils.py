@@ -36,7 +36,7 @@ def zip_folder(bkp_folder_path):
     folder_name = get_last_folder(bkp_folder_path)
     cmd = os.system('zip -r {0}.zip {0}'.format(folder_name))
     if cmd != 0:
-        raise Exception('Could not zip folder in {0}'.format(folder_name))
+        raise Exception('Could not zip folder in {0}'.format(path))
 
 
 def delete_old_files(days_delete, folder):
