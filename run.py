@@ -10,8 +10,8 @@ BKP_CONFIG = {
     'host_machine': '172.16.225.18',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/rancher/shannon/',
-    'server_mount_folder': '/shannon/genomikalab/Backups/Bancos/',
+    'local_destiny_folder': '/rancher/shannon/gnmklabbkp/genomikalab/Backups/Bancos/',
+    'server_mount_folder': '/rancher/shannon/gnmklabbkp/genomikalab/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
         'template0',
