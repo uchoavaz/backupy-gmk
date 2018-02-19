@@ -10,8 +10,8 @@ BKP_CONFIG = {
     'host_machine': '172.16.230.22',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/rancher/rosalind/',
-    'server_mount_folder': '/rancher/rosalind/',
+    'local_destiny_folder': '/rancher/rosalindlab/genomikalab/Backups/Bancos/',
+    'server_mount_folder': '/rancher/rosalindlab/genomikalab/Backups/Bancos/',
     'DB_IGNORED': [
         'template1',
         'template0',
