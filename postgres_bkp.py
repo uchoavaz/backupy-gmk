@@ -438,50 +438,64 @@ class Pg_Backup():
             # )
             # self.db.query(query)
             # self.mount(self.config)
+            if os.path.ismount(self.config['local_destiny_folder']):
 
-            self.insert_config(
-                self.config['pg_user'], self.config['db_password'])
-            db_list = self.get_db_list(
-                self.config['db_password'], self.config['pg_user'], self.config['host_machine'])
+                self.insert_config(
+                    self.config['pg_user'], self.config['db_password'])
+                db_list = self.get_db_list(
+                    self.config['db_password'], self.config['pg_user'], self.config['host_machine'])
 
-            self.create_bkp_files(db_list, self.config)
-            msg = "Deleting old folders"
-            self.pk_log_row = self.db.insert(
-                self.config['db_name_log_record'], {
-                    'backup_id': self.pk_row,
-                    'log': msg,
-                    'status': 1,
-                    'log_datetime': 'now()'
-                }
-            )
+                self.create_bkp_files(db_list, self.config)
+                msg = "Deleting old folders"
+                self.pk_log_row = self.db.insert(
+                    self.config['db_name_log_record'], {
+                        'backup_id': self.pk_row,
+                        'log': msg,
+                        'status': 1,
+                        'log_datetime': 'now()'
+                    }
+                )
 
-            folders_deleted = delete_old_files(
-                self.config['days_delete'],
-                get_last_folder_path(self.bkp_folder_path))
+                folders_deleted = delete_old_files(
+                    self.config['days_delete'],
+                    get_last_folder_path(self.bkp_folder_path))
 
-            msg = "Old folders deleted: {0}".format(folders_deleted)
-            self.steps_done.append(True)
-            self.db.update(
-                self.config['db_name_log_record'], {
-                    'id': self.pk_log_row,
-                    'status': 2,
-                    'log': msg
-                }
-            )
-            self.db.update(
-                self.config['db_name_record'], {
-                    'id': self.pk_row,
-                    'status': 1,
-                    'percents_completed': self.count_percentage(),
-                    'finish_backup_datetime': 'NULL'
-                }
+                msg = "Old folders deleted: {0}".format(folders_deleted)
+                self.steps_done.append(True)
+                self.db.update(
+                    self.config['db_name_log_record'], {
+                        'id': self.pk_log_row,
+                        'status': 2,
+                        'log': msg
+                    }
+                )
+                self.db.update(
+                    self.config['db_name_record'], {
+                        'id': self.pk_row,
+                        'status': 1,
+                        'percents_completed': self.count_percentage(),
+                        'finish_backup_datetime': 'NULL'
+                    }
 
-            )
-            self.email_context_success = self.email_context_success \
-                + '- {0}\n'.format(
-                    msg)
+                )
+                self.email_context_success = self.email_context_success \
+                    + '- {0}\n'.format(
+                        msg)
 
-            self.sync(self.config)
+                self.sync(self.config)
+
+            else:
+                err = "{0} not mounted".format(self.config['local_destiny_folder'])
+                self.email_context_error = \
+                    self.email_context_error + err + '\n'
+                self.db.insert(
+                    self.config['db_name_log_record'], {
+                        'backup_id': self.pk_row,
+                        'log': err,
+                        'status': 4,
+                        'log_datetime': 'now()'
+                    }
+                )
 
         except KeyError as err:
             err = "Error in {0}! Variable not found: ".format(
