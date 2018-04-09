@@ -10,8 +10,8 @@ BKP_CONFIG = {
     'host_machine': '172.16.230.22',
     'db_password': 'g3n3t1c@',
     'port': '5432',
-    'local_destiny_folder': '/rancher/genomikalab',
-    'server_mount_folder': '/rancher/genomikalab',
+    'local_destiny_folder': '/rancher',
+    'server_mount_folder': '/rancher',
     'DB_IGNORED': [
         'template1',
         'template0',
