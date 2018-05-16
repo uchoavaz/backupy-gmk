@@ -1,0 +1,9 @@
+version: '2'
+services:
+  backupy:
+    tty: true
+    build: .
+    image: backupy
+    volumes:
+    - .:/var/www/
+    - /media:/bkps/
