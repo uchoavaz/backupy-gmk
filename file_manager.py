@@ -10,13 +10,13 @@ def read_line(line):
     len_date = len(sub_split[0].split()) - 2
     time = sub_split[0].split()[len_time]
     date_string = sub_split[0].split()[len_date]
-    datetime = date_string + ' ' + time
     log = sub_split[(len_sub_split - 1)].strip('\n')
-    bkp_name = line.replace(log, '').replace(datetime, '').strip()
+    bkp_name = line.replace(log, '').replace(date_string, '').replace(time, '').strip()
 
     return {
         'bkp_name':bkp_name, 
-        'datetime': datetime,
+        'date': date_string,
+        'time': time,
         'log': log
         }
 
