@@ -1,7 +1,9 @@
 
-from datetime import datetime
 import pytz
 import ipdb
+from decouple import config
+from datetime import datetime
+
 
 def read_line(line):
     sub_split = line.split('      ')
@@ -51,3 +53,16 @@ def is_today_file(file):
         is_today = True
 
     return is_today
+
+def convert_data(date, time):
+
+    datetime_str = date + ' ' + time
+    datetime_cnvrtd = datetime.strptime(datetime_str, '%Y-%m-%d %X')
+    return datetime_cnvrtd.replace(tzinfo=pytz.timezone('America/Recife'))
+
+def ignore_bkp(bkp_name):
+    ignored_list = config('IGNORED_BKPS', default='').split(',')
+    if bkp_name in ignored_list:
+        return True
+
+    return False

@@ -1,17 +1,77 @@
 
-from os.path import isfile, join
-from decouple import config
-from file_manager import read_file
-from file_manager import is_today_file
-from os import listdir
-from os import path
 import ipdb
+import pytz
+from os import path
+from os import listdir
+from decouple import config
+from os.path import isfile, join
+from datetime import datetime
+from utils import read_file
+from utils import is_today_file
+from utils import convert_data
+from utils import ignore_bkp
+from database.database import InsertData
 
 
 class Executor():
 
     def __init__(self, log_folder):
         self.log_folder = log_folder
+        self.db = InsertData()
+
+    def save_data(self, file_data):
+        ipdb.set_trace()
+        for bkp in file_data:
+            ignore = ignore_bkp(bkp)
+            if not ignore:
+                for line in file_data[bkp]:
+                    start_date = file_data[bkp][line]['start_date']
+                    start_time = file_data[bkp][line]['start_time']
+                    datetime_cnvrtd = convert_data(start_date, start_time)
+                    table_name = 'core_backup'
+                    column_value = {
+                        'name': bkp,
+                        'percents_completed': 0,
+                        'status': 1,
+                        'start_backup_datetime': "'{0}'".format(datetime_cnvrtd),
+                        'finish_backup_datetime': 'NULL'
+                    }
+                    pk_row = self.db.insert(
+                        table_name, column_value)
+
+                    for log in file_data[bkp][line]['logs']:
+                        datetime_cnvrtd = convert_data(log['date'], log['time'])
+                        pk_log_row = self.db.insert(
+                            'core_backuplog', {
+                                'backup_id': pk_row,
+                                'log': log['log'],
+                                'status': 1,
+                                'log_datetime': "'{0}'".format(datetime_cnvrtd)
+                            }
+                    )
+
+                    try:
+                        end_date = file_data[bkp][line]['end_date']
+                        end_time = file_data[bkp][line]['end_time']
+                        datetime_cnvrtd = convert_data(end_date, end_time)
+                        status = 2
+                        if file_data[bkp][line]['logs']:
+                            status = 3
+
+                        self.db.update(
+                            'core_backup', {
+                                'id': pk_row,
+                                'status': status,
+                                'percents_completed': 100.0,
+                                'finish_backup_datetime': "'{0}'".format(datetime_cnvrtd)
+                            }
+
+                        )
+
+                    except KeyError:
+                        pass
+
+
 
     def treat_data(self, dic_file):
         data = {}
@@ -53,7 +113,7 @@ class Executor():
                 log_dic['log'] = log_string
                 data[bkp_name][count_log]['logs'].append(log_dic)
 
-        ipdb.set_trace()
+        return data
                 
     def read_logs(self):
         dic_file = None
@@ -66,7 +126,8 @@ class Executor():
 
     def run(self):
         dic_file = self.read_logs()
-        self.treat_data(dic_file)
+        file_data = self.treat_data(dic_file)
+        self.save_data(file_data)
 
 
 if __name__ == "__main__":
