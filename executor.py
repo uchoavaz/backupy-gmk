@@ -63,7 +63,6 @@ class Executor():
                     datetime_cnvrtd = convert_data(start_date, start_time, False)
 
                     bkp_exists, pk_row_db = self.check_existent_bkp(bkp, datetime_cnvrtd)
-                    ipdb.set_trace()
                     if not bkp_exists:
 
                         table_name = 'core_backup'
@@ -165,10 +164,17 @@ class Executor():
         return dic_file
 
     def run(self):
-        dic_file = self.read_logs()
-        file_data = self.treat_data(dic_file)
-        self.save_data(file_data)
+        try:
+            dic_file = self.read_logs()
+            file_data = self.treat_data(dic_file)
+            self.save_data(file_data)
 
+        except Exception as e:
+            error_msg = str(e)
+
+
+        finally:
+            pass
 
 if __name__ == "__main__":
     agent = Executor(config('LOG_FOLDER'))
