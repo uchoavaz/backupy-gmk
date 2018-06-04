@@ -85,12 +85,12 @@ class InsertData():
     def get(self, table_name):
         if table_name == 'core_backup':
              self.cur.execute(
-                u"SELECT name FROM {0}".format(
+                u"SELECT id, name, start_backup_datetime, finish_backup_datetime FROM {0}".format(
                     table_name,
                 )
             )
         rows = self.cur.fetchall()
-        print (rows)
+        return rows
     def query(self, query):
         self.cur.execute(query)
         self.conn.commit()
