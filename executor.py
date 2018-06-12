@@ -11,10 +11,16 @@ from utils import read_file
 from utils import is_today_file
 from utils import convert_data
 from utils import ignore_bkp
+from mailer import Mailer
 from database.database import InsertData
 
 
 class Executor():
+
+    alert_msg = 'Backups with alert:\n'
+    success_msg = 'Backups with sucess:\n'
+    error_msg = 'Backups with error:\n'
+    except_msg = 'Agent Error:\n'
 
     def __init__(self, log_folder):
         self.log_folder = log_folder
@@ -54,10 +60,13 @@ class Executor():
         return bkp_exists, pk_row
 
     def save_data(self, file_data):
+        error_status  = False
+        email_list = []
         for bkp in file_data:
             ignore = ignore_bkp(bkp)
             if not ignore:
                 for line in file_data[bkp]:
+                    error_status  = False
                     start_date = file_data[bkp][line]['start_date']
                     start_time = file_data[bkp][line]['start_time']
                     datetime_cnvrtd = convert_data(start_date, start_time, False)
@@ -80,11 +89,16 @@ class Executor():
                         for log in file_data[bkp][line]['logs']:
                             datetime_cnvrtd = convert_data(
                                 log['date'], log['time'], True)
+                            if 'Backup failed' in log['log']:
+                                log_status = 4
+                                error_status = True
+                            else:
+                                log_status = 1
                             pk_log_row = self.db.insert(
                                 'core_backuplog', {
                                     'backup_id': pk_row,
                                     'log': log['log'],
-                                    'status': 1,
+                                    'status': log_status,
                                     'log_datetime': "'{0}'".format(datetime_cnvrtd)
                                 }
                         )
@@ -94,14 +108,32 @@ class Executor():
                             end_time = file_data[bkp][line]['end_time']
                             datetime_cnvrtd = convert_data(end_date, end_time, True)
                             status = 2
+                            percents_completed = 100.0
+
                             if file_data[bkp][line]['logs']:
                                 status = 3
+                                if error_status:
+                                    status = 4
+                                    percents_completed = 0.0
+
+                            msg = '- {0} - start:{1} end:{2}\n'.format(
+                                bkp, (start_date + ' ' + start_time), (end_date + ' ' + end_time))
+
+                            if status == 2 and msg not in email_list:
+                                self.success_msg = self.success_msg + msg
+                                email_list.append(msg)
+                            if status == 3 and msg not in email_list:
+                                self.alert_msg = self.alert_msg + msg
+                                email_list.append(msg)
+                            if status == 4 and msg not in email_list:
+                                self.error_msg = self.error_msg + msg
+                                email_list.append(msg)
 
                             self.db.update(
                                 'core_backup', {
                                     'id': pk_row,
                                     'status': status,
-                                    'percents_completed': 100.0,
+                                    'percents_completed': percents_completed,
                                     'finish_backup_datetime': "'{0}'".format(datetime_cnvrtd)
                                 }
 
@@ -109,7 +141,6 @@ class Executor():
 
                         except KeyError:
                             pass
-
 
 
     def treat_data(self, dic_file):
@@ -141,6 +172,20 @@ class Executor():
                 data[bkp_name][count_log]['end_date'] = end_date
                 data[bkp_name][count_log]['end_time'] = end_time
                 count_log = count_log + 1
+            elif 'Backup failed' in dic_file['lines'][line]['log']:
+                start_date = dic_file['lines'][line]['bkp_name'].split(' ')[0]
+                start_time = dic_file['lines'][line]['bkp_name'].split(' ')[1]
+                bkp_name = dic_file['lines'][line]['date']
+                data[bkp_name] = {}
+                data[bkp_name][count_log] = {}
+                data[bkp_name][count_log]['start_date'] = start_date
+                data[bkp_name][count_log]['start_time'] = start_time
+                data[bkp_name][count_log]['end_date'] = start_date
+                data[bkp_name][count_log]['end_time'] = start_time
+                data[bkp_name][count_log]['logs'] = [{
+                    'date':start_date,'time':start_time,'log':dic_file['lines'][line]['log']
+                }] 
+                count_log = count_log + 1
 
             elif read_logs:
                 log_string = dic_file['lines'][line]['log']
@@ -170,11 +215,11 @@ class Executor():
             self.save_data(file_data)
 
         except Exception as e:
-            error_msg = str(e)
-
+            self.except_msg = self.except_msg + '- ' + str(e)
 
         finally:
-            pass
+            email = Mailer()
+            email.send(self.success_msg, self.alert_msg, self.error_msg, self.except_msg)
 
 if __name__ == "__main__":
     agent = Executor(config('LOG_FOLDER'))

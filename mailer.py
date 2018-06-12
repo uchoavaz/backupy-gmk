@@ -1,4 +1,6 @@
 
+import ipdb
+import time
 import smtplib
 from decouple import config
 from email.mime.text import MIMEText
@@ -8,30 +10,35 @@ from email.mime.multipart import MIMEMultipart
 class Mailer():
 
 	def __init__(self):
-		fromaddr = self.from_address = config('MAIL_SENDER', default='')
+		self.fromaddr = config('MAIL_SENDER', default='')
+		self.toaddr = config('SEND_TO', default='')
 		port = config('EMAIL_PORT', default='')
 		host = config('EMAIL_HOST', default='')
 		password = config('EMAIL_PASSWORD', default='')
 		self.server = smtplib.SMTP(host, port)
 		self.server.starttls()
-		self.server.login(fromaddr, password)
+		self.server.login(self.fromaddr, password)
 
-	def treat_msg(self, success_msg, error_msg):
-		msg = "Success:"
-		msg = msg + "\n" + success_msg
-		msg = msg + "\n\n" + "Errors:"
-		msg = msg + "\n" + error_msg 
+	def treat_msg(self, success_msg, alert_msg, error_msg, except_error):
+		msg = success_msg + '\n' + alert_msg + '\n' + error_msg + '\n' + except_error
 		return msg
 
-	def send(self, success_msg, error_msg):
-		msg = self.treat_msg(success_msg, error_msg)
+	def dispatch(self, treated_msg):
 
-		msg = MIMEMultipart()
-		msg['From'] = fromaddr
-		msg['To'] = toaddr
-		msg['Subject'] = "SUBJECT OF THE MAIL"
-		body = "YOUR MESSAGE HERE"
-		msg.attach(MIMEText(body, 'plain'))
-		text = msg.as_string()
-		server.sendmail(fromaddr, toaddr, text)
+		emails = self.toaddr.split(',')
+		for email in emails:
+			msg = MIMEMultipart()
+			msg['From'] = self.fromaddr
+			msg['To'] = email
+			msg['Subject'] = "{0}'backup' at {1}".format(
+				config('AGENT_SERVER'), time.strftime('%d-%m-%Y:%H:%M'))
+			body = treated_msg
+			msg.attach(MIMEText(body, 'plain'))
+			text = msg.as_string()
+			self.server.sendmail(self.fromaddr, self.toaddr, text)
+
+	def send(self, success_msg, alert_msg, error_msg, except_error):
+		treated_msg = self.treat_msg(success_msg, alert_msg, error_msg, except_error)
+
+		self.dispatch(treated_msg)
 		self.server.quit()
