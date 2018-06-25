@@ -1,8 +1,12 @@
 
 import ipdb
 import pytz
+import time
+import glob
+from os import walk
 from os import path
 from os import listdir
+from os import stat
 from decouple import config
 from os.path import isfile, join
 from datetime import datetime
@@ -25,6 +29,31 @@ class Executor():
     def __init__(self, log_folder):
         self.log_folder = log_folder
         self.db = InsertData()
+
+    def check_data_integrity(self, bkp_name):
+
+        list_old_lastmodified_files = []
+        has_old_lastmodified_files = False
+        today = datetime.today()
+        today_year = today.year
+        today_month = today.month
+        today_day = today.day
+
+        full_path = path.join(config('DBS_FOLDER'), bkp_name)
+        for filename in listdir(full_path):
+            full_path_file = path.join(full_path, filename)
+            lastmodified = stat(full_path_file).st_mtime
+
+            lastmodified_datetime = datetime.fromtimestamp(lastmodified)
+
+            if lastmodified_datetime.day != today_day \
+                or lastmodified_datetime.month != today.month \
+                or lastmodified_datetime.year != today_year:
+
+                list_old_lastmodified_files.append(filename)
+                has_old_lastmodified_files = True
+
+        return has_old_lastmodified_files, list_old_lastmodified_files      
 
     def check_existent_bkp(self, bkp_name, datetime):
         bkp_exists = False
@@ -65,6 +94,7 @@ class Executor():
         for bkp in file_data:
             ignore = ignore_bkp(bkp)
             if not ignore:
+                has_old_lastmodified_files, list_old_lastmodified_files = self.check_data_integrity(bkp)
                 for line in file_data[bkp]:
                     error_status  = False
                     start_date = file_data[bkp][line]['start_date']
@@ -103,6 +133,15 @@ class Executor():
                                 }
                         )
 
+                        if has_old_lastmodified_files:
+                            self.db.insert(
+                                'core_backuplog', {
+                                    'backup_id': pk_row,
+                                    'log': 'Files not modified: ' + ','.join(list_old_lastmodified_files),
+                                    'status': 4,
+                                    'log_datetime': "'{0}'".format('now()')
+                                }
+                        )
                         try:
                             end_date = file_data[bkp][line]['end_date']
                             end_time = file_data[bkp][line]['end_time']
@@ -110,9 +149,9 @@ class Executor():
                             status = 2
                             percents_completed = 100.0
 
-                            if file_data[bkp][line]['logs']:
+                            if file_data[bkp][line]['logs'] or has_old_lastmodified_files:
                                 status = 3
-                                if error_status:
+                                if error_status or has_old_lastmodified_files:
                                     status = 4
                                     percents_completed = 0.0
 
