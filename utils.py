@@ -1,6 +1,7 @@
 
 import pytz
 import ipdb
+from os import getenv
 from decouple import config
 from datetime import datetime
 from datetime import timedelta
@@ -63,7 +64,7 @@ def convert_data(date, time, correct_time):
     return datetime_cnvrtd.replace(tzinfo=pytz.timezone('America/Recife'))
 
 def ignore_bkp(bkp_name):
-    ignored_list = config('IGNORED_BKPS', default='').split(',')
+    ignored_list = getenv('IGNORED_BKPS', '').split(',')
     if bkp_name in ignored_list:
         return True
 

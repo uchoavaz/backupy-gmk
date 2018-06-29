@@ -4,6 +4,9 @@ services:
     tty: true
     build: .
     image: backupy
+    environment:
+    - IGNORED_BKPS=bkps_logs
+    - AGENT_SERVER=WINSERVER_PROD
     volumes:
     - .:/var/www/
     - /media:/bkps/

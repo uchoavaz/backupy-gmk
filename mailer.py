@@ -2,6 +2,7 @@
 import ipdb
 import time
 import smtplib
+from os import getenv
 from decouple import config
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -31,7 +32,7 @@ class Mailer():
 			msg['From'] = self.fromaddr
 			msg['To'] = email
 			msg['Subject'] = "{0}'backup' at {1}".format(
-				config('AGENT_SERVER'), time.strftime('%d-%m-%Y:%H:%M'))
+				getenv('AGENT_SERVER', ''), time.strftime('%d-%m-%Y:%H:%M'))
 			body = treated_msg
 			msg.attach(MIMEText(body, 'plain'))
 			text = msg.as_string()
