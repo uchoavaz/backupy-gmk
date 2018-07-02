@@ -64,7 +64,7 @@ def convert_data(date, time, correct_time):
     return datetime_cnvrtd.replace(tzinfo=pytz.timezone('America/Recife'))
 
 def ignore_bkp(bkp_name):
-    ignored_list = getenv('IGNORED_BKPS', '').split(',')
+    ignored_list = config('IGNORED_BKPS', default='').split(',')
     if bkp_name in ignored_list:
         return True
 

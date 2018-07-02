@@ -32,7 +32,7 @@ class Mailer():
 			msg['From'] = self.fromaddr
 			msg['To'] = email
 			msg['Subject'] = "{0}'backup' at {1}".format(
-				getenv('AGENT_SERVER', ''), time.strftime('%d-%m-%Y:%H:%M'))
+				config('AGENT_SERVER', default=''), time.strftime('%d-%m-%Y:%H:%M'))
 			body = treated_msg
 			msg.attach(MIMEText(body, 'plain'))
 			text = msg.as_string()
