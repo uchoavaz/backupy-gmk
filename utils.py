@@ -69,3 +69,10 @@ def ignore_bkp(bkp_name):
         return True
 
     return False
+
+def check_integrity(bkp_name):
+    integrity_list = config('DO_NOT_CHECK_DBS_INTEGRITY_LIST', default='').split(',')
+    if bkp_name in integrity_list:
+        return True
+
+    return False

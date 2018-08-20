@@ -15,6 +15,7 @@ from utils import read_file
 from utils import is_today_file
 from utils import convert_data
 from utils import ignore_bkp
+from utils import check_integrity
 from mailer import Mailer
 from database.database import InsertData
 
@@ -34,24 +35,27 @@ class Executor():
 
         list_old_lastmodified_files = []
         has_old_lastmodified_files = False
-        today = datetime.today()
-        today_year = today.year
-        today_month = today.month
-        today_day = today.day
 
-        full_path = path.join(config('DBS_FOLDER'), bkp_name)
-        for filename in listdir(full_path):
-            full_path_file = path.join(full_path, filename)
-            lastmodified = stat(full_path_file).st_mtime
+        if check_integrity(bkp_name):
 
-            lastmodified_datetime = datetime.fromtimestamp(lastmodified)
+            today = datetime.today()
+            today_year = today.year
+            today_month = today.month
+            today_day = today.day
 
-            if lastmodified_datetime.day != today_day \
-                or lastmodified_datetime.month != today.month \
-                or lastmodified_datetime.year != today_year:
+            full_path = path.join(config('DBS_FOLDER'), bkp_name)
+            for filename in listdir(full_path):
+                full_path_file = path.join(full_path, filename)
+                lastmodified = stat(full_path_file).st_mtime
 
-                list_old_lastmodified_files.append(filename)
-                has_old_lastmodified_files = True
+                lastmodified_datetime = datetime.fromtimestamp(lastmodified)
+
+                if lastmodified_datetime.day != today_day \
+                    or lastmodified_datetime.month != today.month \
+                    or lastmodified_datetime.year != today_year:
+
+                    list_old_lastmodified_files.append(filename)
+                    has_old_lastmodified_files = True
 
         return has_old_lastmodified_files, list_old_lastmodified_files      
 
