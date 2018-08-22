@@ -36,7 +36,7 @@ class Executor():
         list_old_lastmodified_files = []
         has_old_lastmodified_files = False
 
-        if check_integrity(bkp_name):
+        if not check_integrity(bkp_name):
 
             today = datetime.today()
             today_year = today.year
