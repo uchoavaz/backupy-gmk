@@ -24,7 +24,7 @@ BKP_CONFIG = {
     'folders_to_pass': [
         "/rancher/apps/gnmk-labs",
         "/rancher/apps/gensoft/mediafiles/media",
-        "/rancher/apps/se4mr/media"
+        "/rancher/apps/se4mr/media/media_root"
 
     ],
     'send_email_success': True
