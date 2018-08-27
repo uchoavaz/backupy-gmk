@@ -8,13 +8,19 @@ from datetime import timedelta
 
 def read_line(line):
     sub_split = line.split('      ')
-    len_sub_split = len(sub_split)
-    len_time = len(sub_split[0].split()) - 1
-    len_date = len(sub_split[0].split()) - 2
-    time = sub_split[0].split()[len_time]
-    date_string = sub_split[0].split()[len_date]
-    log = sub_split[(len_sub_split - 1)].strip('\n')
-    bkp_name = line.replace(log, '').replace(date_string, '').replace(time, '').strip()
+    if len(sub_split) > 2:
+        bkp_name = sub_split[0]
+        time = sub_split[1].split()[0]
+        date_string = sub_split[1].split()[1]
+        log = sub_split[2].strip('\n')
+    else:
+        len_sub_split = len(sub_split)
+        len_time = len(sub_split[0].split()) - 1
+        len_date = len(sub_split[0].split()) - 2
+        time = sub_split[0].split()[len_time]
+        date_string = sub_split[0].split()[len_date]
+        log = sub_split[(len_sub_split - 1)].strip('\n')
+        bkp_name = line.replace(log, '').replace(date_string, '').replace(time, '').strip()
 
     return {
         'bkp_name':bkp_name, 
